@@ -11,11 +11,12 @@ class eight_puzzle:
 ## Heuristic numbers:
 ## 1)Uniform Cost Search
 ## 2)A* with the Misplaced Tile heuristic
-## TBD 3)A* with the Manhattan Distance heuristic
+## 3)A* with the Manhattan Distance heuristic
 heuristic = 1
 
 total_nodes_expanded = 0
 visited_nodes_state = []
+max_queue_size = 0
 
 def calculate_h(node):
   h = 0
@@ -26,6 +27,13 @@ def calculate_h(node):
       for j,val in enumerate(row):
         if val != 0  and val != i*3+j+1:
           h += 1
+  if heuristic == 3:
+    for i,row in enumerate(node.state):
+      for j,val in enumerate(row):
+        actual_i, actual_j = val/3, val%3 -1
+        if actual_j == -1:
+          actual_i, actual_j = 2,2
+        h += abs(actual_i - i) + abs(actual_j - j)
   return h
   
 def get_input():
@@ -37,7 +45,7 @@ def get_input():
   row3 = input("Enter third row (space separated):")
   problem.state[2] = [int(x) for x in row3.split()]
   global heuristic
-  heuristic = int(input("Choose one of the following (Type 1 or 2)\n1) Uniform Cost Search\n2) A* with the Misplaced Tile heuristic\nEnter:"))
+  heuristic = int(input("Choose one of the following (Type 1, 2 or 3)\n1) Uniform Cost Search\n2) A* with the Misplaced Tile heuristic\n3) A* with the Manhattan Distance heuristic\nEnter:"))
   problem.g = 0
   problem.h = calculate_h(problem)
   return problem
@@ -109,14 +117,19 @@ def expand(node):
     
     
 def queuing_func(nodes, expanded_nodes):
+  global max_queue_size
   for item in expanded_nodes:
     heapq.heappush(nodes,item)
+  if len(nodes) > max_queue_size:
+    max_queue_size = len(nodes)
   return nodes
 
 def general_search(problem):
   nodes = []
   nodes.append(problem)
   heapq.heapify(nodes)
+  global max_queue_size 
+  max_queue_size = len(nodes)
   visited_nodes_state.append(problem.state)
   while (1):
     if len(nodes) == 0:
@@ -128,4 +141,5 @@ def general_search(problem):
 
 problem = get_input()
 print(general_search(problem))
+print("Maximum queue size: ", max_queue_size)
 print("Total nodes expanded:", total_nodes_expanded)
