@@ -1,8 +1,12 @@
-from copy import copy, deepcopy
+from copy import deepcopy
+import heapq
+
 class eight_puzzle:
   state = [[0,0,0],[0,0,0],[0,0,0]]
   g = -1
   h = -1
+  def __lt__(self, other):
+    return self.g + self.h < other.g + other.h
 
 ## 1)Uniform Cost Search
 ## TBD 2)A* with the Misplaced Tile heuristic
@@ -29,14 +33,7 @@ def get_input():
   return problem
 
 def remove_front(nodes):
-  next_index = 0
-  best_cost = nodes[next_index].g + nodes[next_index].h
-  ## TBD: Implement priority queue
-  for index,item in enumerate(nodes):
-    if item.g + item.h < best_cost:
-      best_cost = item.g + item.h
-      next_index = index
-  return nodes.pop(next_index)
+  return heapq.heappop(nodes)
 
 def goal_test(node):
   test_success = True
@@ -102,11 +99,14 @@ def expand(node):
     
     
 def queuing_func(nodes, expanded_nodes):
-  return nodes + expanded_nodes
+  for item in expanded_nodes:
+    heapq.heappush(nodes,item)
+  return nodes
 
 def general_search(problem):
   nodes = []
   nodes.append(problem)
+  heapq.heapify(nodes)
   visited_nodes_state.append(problem.state)
   while (1):
     if len(nodes) == 0:
