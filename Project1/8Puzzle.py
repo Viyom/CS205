@@ -8,8 +8,9 @@ class eight_puzzle:
   def __lt__(self, other):
     return self.g + self.h < other.g + other.h
 
+## Heuristic numbers:
 ## 1)Uniform Cost Search
-## TBD 2)A* with the Misplaced Tile heuristic
+## 2)A* with the Misplaced Tile heuristic
 ## TBD 3)A* with the Manhattan Distance heuristic
 heuristic = 1
 
@@ -17,8 +18,15 @@ total_nodes_expanded = 0
 visited_nodes_state = []
 
 def calculate_h(node):
+  h = 0
   if heuristic == 1:
-    return 0
+    h = 0
+  if heuristic == 2:
+    for i,row in enumerate(node.state):
+      for j,val in enumerate(row):
+        if val != 0  and val != i*3+j+1:
+          h += 1
+  return h
   
 def get_input():
   problem = eight_puzzle()
@@ -28,7 +36,9 @@ def get_input():
   problem.state[1] = [int(x) for x in row2.split()]
   row3 = input("Enter third row (space separated):")
   problem.state[2] = [int(x) for x in row3.split()]
-  problem.g = 1
+  global heuristic
+  heuristic = int(input("Choose one of the following (Type 1 or 2)\n1) Uniform Cost Search\n2) A* with the Misplaced Tile heuristic\nEnter:"))
+  problem.g = 0
   problem.h = calculate_h(problem)
   return problem
 
@@ -113,7 +123,7 @@ def general_search(problem):
       return "Solution not found"
     node = remove_front(nodes)
     if goal_test(node):
-      return "Success" + str(node.state)
+      return "Depth:" + str(node.g)
     nodes = queuing_func(nodes, expand(node))
 
 problem = get_input()
