@@ -5,6 +5,7 @@ class eight_puzzle:
   state = [[0,0,0],[0,0,0],[0,0,0]]
   g = -1
   h = -1
+  solution = []
   def __lt__(self, other):
     return self.g + self.h < other.g + other.h
 
@@ -30,7 +31,7 @@ def calculate_h(node):
   if heuristic == 3:
     for i,row in enumerate(node.state):
       for j,val in enumerate(row):
-        actual_i, actual_j = val/3, val%3 -1
+        actual_i, actual_j = (val-1)//3, (val-1)%3
         if actual_j == -1:
           actual_i, actual_j = 2,2
         h += abs(actual_i - i) + abs(actual_j - j)
@@ -80,6 +81,8 @@ def expand(node):
     left.state[i_cord][j_cord-1], left.state[i_cord][j_cord] = left.state[i_cord][j_cord], left.state[i_cord][j_cord-1]
     left.g = node.g + 1
     left.h = calculate_h(left)
+    left.solution = deepcopy(node.solution)
+    left.solution.append("Left")
     if left.state not in visited_nodes_state:
       visited_nodes_state.append(left.state)
       expanded_nodes.append(left)
@@ -90,6 +93,8 @@ def expand(node):
     right.state[i_cord][j_cord+1], right.state[i_cord][j_cord] = right.state[i_cord][j_cord], right.state[i_cord][j_cord+1]
     right.g = node.g + 1
     right.h = calculate_h(right)
+    right.solution = deepcopy(node.solution)
+    right.solution.append("Right")
     if right.state not in visited_nodes_state:
       visited_nodes_state.append(right.state)
       expanded_nodes.append(right)
@@ -100,6 +105,8 @@ def expand(node):
     up.state[i_cord-1][j_cord], up.state[i_cord][j_cord] = up.state[i_cord][j_cord], up.state[i_cord-1][j_cord]
     up.g = node.g + 1
     up.h = calculate_h(up)
+    up.solution = deepcopy(node.solution)
+    up.solution.append("Up")
     if up.state not in visited_nodes_state:
       visited_nodes_state.append(up.state)
       expanded_nodes.append(up)
@@ -110,6 +117,8 @@ def expand(node):
     down.state[i_cord+1][j_cord], down.state[i_cord][j_cord] = down.state[i_cord][j_cord], down.state[i_cord+1][j_cord]
     down.g = node.g + 1
     down.h = calculate_h(down)
+    down.solution = deepcopy(node.solution)
+    down.solution.append("Down")
     if down.state not in visited_nodes_state:
       visited_nodes_state.append(down.state)
       expanded_nodes.append(down)
@@ -136,10 +145,13 @@ def general_search(problem):
       return "Solution not found"
     node = remove_front(nodes)
     if goal_test(node):
-      return "Depth:" + str(node.g)
+      return node
     nodes = queuing_func(nodes, expand(node))
 
 problem = get_input()
-print(general_search(problem))
+
+goal = general_search(problem)
+print ("Solution (Direction to move the blank tile):", goal.solution)
+print ("Depth:", goal.g)
 print("Maximum queue size: ", max_queue_size)
 print("Total nodes expanded:", total_nodes_expanded)
