@@ -19,6 +19,16 @@ total_nodes_expanded = 0
 visited_nodes_state = []
 max_queue_size = 0
 
+sampleProblems = []
+sampleProblems.append([[1,2,3],[4,5,6],[7,8,0]])
+sampleProblems.append([[1,2,3],[4,5,6],[0,7,8]])
+sampleProblems.append([[1,2,3],[5,0,6],[4,7,8]])
+sampleProblems.append([[1,3,6],[5,0,2],[4,7,8]])
+sampleProblems.append([[1,3,6],[5,0,7],[4,8,2]])
+sampleProblems.append([[1,6,7],[5,0,3],[4,8,2]])
+sampleProblems.append([[7,1,2],[4,8,5],[6,3,0]])
+sampleProblems.append([[0,7,2],[4,6,1],[3,5,8]])
+
 def calculate_h(node):
   h = 0
   if heuristic == 1:
@@ -39,12 +49,18 @@ def calculate_h(node):
   
 def get_input():
   problem = eight_puzzle()
-  row1 = input("Enter first row (space separated):")
-  problem.state[0] = [int(x) for x in row1.split()]
-  row2 = input("Enter second row (space separated):")
-  problem.state[1] = [int(x) for x in row2.split()]
-  row3 = input("Enter third row (space separated):")
-  problem.state[2] = [int(x) for x in row3.split()]
+  for i in range(1,9):
+    print (str(i)+")",sampleProblems[i-1])
+  problem_selection = int(input("Choose number from the above sample problems or select 0 to input custom problem:"))
+  if problem_selection == 0:
+    row1 = input("Enter first row (space separated):")
+    problem.state[0] = [int(x) for x in row1.split()]
+    row2 = input("Enter second row (space separated):")
+    problem.state[1] = [int(x) for x in row2.split()]
+    row3 = input("Enter third row (space separated):")
+    problem.state[2] = [int(x) for x in row3.split()]
+  else:
+    problem.state = sampleProblems[problem_selection-1]
   global heuristic
   heuristic = int(input("Choose one of the following (Type 1, 2 or 3)\n1) Uniform Cost Search\n2) A* with the Misplaced Tile heuristic\n3) A* with the Manhattan Distance heuristic\nEnter:"))
   problem.g = 0
@@ -142,7 +158,8 @@ def general_search(problem):
   visited_nodes_state.append(problem.state)
   while (1):
     if len(nodes) == 0:
-      return "Solution not found"
+      print ("Solution does not exist :(")
+      exit()
     node = remove_front(nodes)
     if goal_test(node):
       return node
