@@ -34,7 +34,20 @@ def evaluate(Y_pred, Y_test):
       correct_pred += 1
   return correct_pred
 
+def normalize(X):
+  for list_index, list_ in enumerate(X):
+    max_ = float("-inf")
+    min_ = float("inf")
+    for item in list_:
+      if item > max_:
+        max_= item
+      if item < min_:
+        min_ = item
+    for item_index, item in enumerate(list_):
+      X[list_index][item_index] = (item - min_)/(max_ -  min_)
+
 X, Y = load_dataset('CS205_SP_2022_SMALLtestdata__74.txt')
+normalize(X)
 X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size = 0.20, random_state = 2)
 Y_pred = predict(X_train, Y_train, X_test)
 correct_pred = evaluate(Y_pred, Y_test)
