@@ -48,7 +48,7 @@ def normalize(X):
 
 def find_next_best_feature_index(best_feature_list, X_train, X_test, Y_train, Y_test):
   best_score = 0
-  best_score_index = -1
+  best_score_feature_index = -1
   for index, val in enumerate(X_train[0]):
     if index not in best_feature_list:
       best_feature_list_ = deepcopy(best_feature_list)
@@ -57,8 +57,8 @@ def find_next_best_feature_index(best_feature_list, X_train, X_test, Y_train, Y_
       score = evaluate(y_pred, Y_test)
       if score > best_score:
         best_score = score
-        best_score_index = index
-  return best_score_index # Return best score from here only (Can be used for testing as well)
+        best_score_feature_index = index
+  return best_score_feature_index
 
 def forward_selection(X_train, X_test, Y_train, Y_test):
   best_feature_list = []
@@ -69,7 +69,30 @@ def forward_selection(X_train, X_test, Y_train, Y_test):
     score = evaluate(y_pred, Y_test)
     print ("Correct predictions:", score, "Total predictions:", len(y_pred), "Features selected:", best_feature_list)
 
+def find_next_worst_feature_val(best_feature_list, X_train, X_test, Y_train, Y_test):
+  best_score = 0
+  worst_score_feature_val = -1
+  for val in best_feature_list:
+    best_feature_list_ = deepcopy(best_feature_list)
+    best_feature_list_.remove(val)
+    y_pred = predict(X_train[:,best_feature_list_], Y_train, X_test[:,best_feature_list_])
+    score = evaluate(y_pred, Y_test)
+    if score > best_score:
+      best_score = score
+      worst_score_feature_val = val
+  return worst_score_feature_val
+
+def backward_elimination(X_train, X_test, Y_train, Y_test):
+  best_feature_list = list(range(0,len(X_train[0])))
+  while len(best_feature_list) != 0:
+    y_pred = predict(X_train[:,best_feature_list], Y_train, X_test[:,best_feature_list])
+    score = evaluate(y_pred, Y_test)
+    print ("Correct predictions:", score, "Total predictions:", len(y_pred), "Features selected:", best_feature_list)
+    next_worst = find_next_worst_feature_val(best_feature_list, X_train, X_test, Y_train, Y_test)
+    best_feature_list.remove(next_worst)
+
 X, Y = load_dataset('CS205_SP_2022_SMALLtestdata__74.txt')
 normalize(X)
 X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size = 0.20, random_state = 2)
 forward_selection(X_train, X_test, Y_train, Y_test)
+backward_elimination(X_train, X_test, Y_train, Y_test)
