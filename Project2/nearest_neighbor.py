@@ -46,9 +46,30 @@ def normalize(X):
     for item_index, item in enumerate(list_):
       X[list_index][item_index] = (item - min_)/(max_ -  min_)
 
+def find_next_best_feature_index(best_feature_list, X_train, X_test, Y_train, Y_test):
+  best_score = 0
+  best_score_index = -1
+  for index, val in enumerate(X_train[0]):
+    if index not in best_feature_list:
+      best_feature_list_ = deepcopy(best_feature_list)
+      best_feature_list_.append(index)
+      y_pred = predict(X_train[:,best_feature_list_], Y_train, X_test[:,best_feature_list_])
+      score = evaluate(y_pred, Y_test)
+      if score > best_score:
+        best_score = score
+        best_score_index = index
+  return best_score_index # Return best score from here only (Can be used for testing as well)
+
+def forward_selection(X_train, X_test, Y_train, Y_test):
+  best_feature_list = []
+  for val in X_train[0]:
+    next_best = find_next_best_feature_index(best_feature_list, X_train, X_test, Y_train, Y_test)
+    best_feature_list.append(next_best)
+    y_pred = predict(X_train[:,best_feature_list], Y_train, X_test[:,best_feature_list])
+    score = evaluate(y_pred, Y_test)
+    print ("Correct predictions:", score, "Total predictions:", len(y_pred), "Features selected:", best_feature_list)
+
 X, Y = load_dataset('CS205_SP_2022_SMALLtestdata__74.txt')
 normalize(X)
 X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size = 0.20, random_state = 2)
-Y_pred = predict(X_train, Y_train, X_test)
-correct_pred = evaluate(Y_pred, Y_test)
-print ("Correct predictions:", correct_pred, "Total predictions:", len(Y_pred))
+forward_selection(X_train, X_test, Y_train, Y_test)
