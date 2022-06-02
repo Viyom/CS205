@@ -67,6 +67,10 @@ def forward_selection(X_train, X_test, Y_train, Y_test):
   global final_best_features
   global final_best_score
   best_feature_list = []
+  ## Check for empty feature list in the beginning
+  score = max((Y_test==1).sum(),(Y_test==2).sum())
+  final_best_score = score
+  print ("Correct predictions:", score, "Total predictions:", len(Y_test), "Features selected:", best_feature_list)
   for val in X_train[0]:
     next_best = find_next_best_feature_index(best_feature_list, X_train, X_test, Y_train, Y_test)
     best_feature_list.append(next_best)
@@ -103,6 +107,12 @@ def backward_elimination(X_train, X_test, Y_train, Y_test):
     print ("Correct predictions:", score, "Total predictions:", len(y_pred), "Features selected:", best_feature_list)
     next_worst = find_next_worst_feature_val(best_feature_list, X_train, X_test, Y_train, Y_test)
     best_feature_list.remove(next_worst)
+  ## Check for empty feature list at the end
+  score = max((Y_test==1).sum(),(Y_test==2).sum())
+  if score > final_best_score:
+    final_best_score = score
+    final_best_features = []
+  print ("Correct predictions:", score, "Total predictions:", len(Y_test), "Features selected:", [])
 
 def get_input():
   dataset = int(input("Choose the dataset to be evaluated (Enter 1 or 2)\n1) Small\n2) Large (WARNING: Since the dataset is large it will take much more time to execute)\nEnter: "))
