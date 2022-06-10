@@ -38,16 +38,18 @@ def evaluate(Y_pred, Y_test):
   return correct_pred
 
 def normalize(X):
-  for list_index, list_ in enumerate(X):
+  for feature in list(range(len(X[0]))):
     max_ = float("-inf")
     min_ = float("inf")
-    for item in list_:
+    for data_point in list(range(len(X))):
+      item = X[data_point][feature]
       if item > max_:
-        max_= item
+        max_ = item
       if item < min_:
         min_ = item
-    for item_index, item in enumerate(list_):
-      X[list_index][item_index] = (item - min_)/(max_ -  min_)
+    for data_point in list(range(len(X))):
+      item = X[data_point][feature]
+      X[data_point][feature] = (item - min_)/(max_ -  min_)
 
 def find_next_best_feature_index(best_feature_list, X_train, X_test, Y_train, Y_test):
   best_score = 0
